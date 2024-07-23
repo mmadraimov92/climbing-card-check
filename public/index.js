@@ -48,7 +48,7 @@ Vue.createApp({
 	},
 	methods: {
 		fetchClimberData: function (id) {
-			return fetch(`/api/check?id=${id}`)
+			return fetch(`/api/v2/check?id=${id}`)
 				.then((response) => {
 					console.log(response);
 					if (!response.ok) {
@@ -85,7 +85,8 @@ Vue.createApp({
 		},
 		formatClimberData: function (raw) {
 			let result = raw;
-			result.formattedExamTime = result.examTime?.replaceAll('-', '/') || 'N/A';
+			result.formattedExamTime = result.examTime ? new Date(Date.parse(result.examTime)).toLocaleDateString() : 'N/A';
+			result.formattedExpiryTime = result.expiryTime ? new Date(Date.parse(result.expiryTime)).toLocaleDateString() : 'N/A';
 			result.certificate = this.invalidateCertificateIfExpired(result);
 			return result;
 		},

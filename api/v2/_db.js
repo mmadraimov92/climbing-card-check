@@ -22,7 +22,16 @@ const connect = async () => {
 const fetchById = async (id) => {
 	const client = await connect();
 	try {
-		const res = await client.query('SELECT id, certificate FROM climbers WHERE id = $1', [id]);
+		const res = await client.query(`
+      SELECT
+        id,
+        certificate,
+        name,
+        examiner,
+        exam_date AS "examTime",
+        expiry_date AS "expiryTime"
+      FROM climbers
+      WHERE id = $1`, [id]);
 		if (!res.rowCount) {
 			throw new Error('not found');
 		}
