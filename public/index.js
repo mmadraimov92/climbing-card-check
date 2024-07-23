@@ -50,7 +50,6 @@ Vue.createApp({
 		fetchClimberData: function (id) {
 			return fetch(`/api/v2/check?id=${id}`)
 				.then((response) => {
-					console.log(response);
 					if (!response.ok) {
 						throw new Error('Request error: ' + response.statusText);
 					}

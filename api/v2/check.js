@@ -12,12 +12,13 @@ export default async function handler(request, response) {
 		return response.status(400).json(err.message);
 	}
 
-	console.log({ ts: new Date(), responseTime: Date.now() - start, id});
 	try {
 		const result = await db.fetchById(id); 
 		return response.status(200).json({success:true, ...result});
 	} catch (error) {
 		console.log(error);
 		return response.status(200).json({success:false, id, message: error.message });
+	} finally {
+		console.log({ ts: new Date(), responseTime: Date.now() - start, id});
 	}
 }
