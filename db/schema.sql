@@ -1,0 +1,10 @@
+CREATE TABLE climbers (
+  id NUMERIC(11) PRIMARY KEY,
+  name VARCHAR (64) NOT NULL,
+  email VARCHAR (255) UNIQUE NOT NULL,
+  certificate VARCHAR (16) NOT NULL,
+  exam_date TIMESTAMP,
+  expiry_date TIMESTAMP,
+  examiner VARCHAR(64),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
