@@ -10,7 +10,10 @@ const connect = async () => {
 		database: process.env.PGDATABASE || 'postgres',
 		query_timeout: 5000,
 		connectionTimeoutMillis: 5000,
-		ssl: process.env.SSL_MODE || false,
+		ssl: process.env.SSL_CERT ? {
+			rejectUnauthorized: false,
+			cert: process.env.SSL_CERT,
+		} : false,
 	};
 
 	const client = new Client(config);
