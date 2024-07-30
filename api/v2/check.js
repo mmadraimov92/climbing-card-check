@@ -3,6 +3,10 @@ import * as db from './_db.js';
 import { validateId } from './_validation.js';
 
 export default async function handler(request, response) {
+	if (request.method !== 'GET') {
+		return response.status(405).send();
+	}
+
 	const start = Date.now();
 
 	const { id } = request.query;
