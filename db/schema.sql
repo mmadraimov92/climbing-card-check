@@ -16,5 +16,6 @@ CREATE TABLE emails (
   email_slug UUID NOT NULL DEFAULT gen_random_uuid(),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   email_sent_at TIMESTAMP,
-  email_status VARCHAR(64)
+  email_status VARCHAR(64),
+  status_updated_at TIMESTAMP
 );

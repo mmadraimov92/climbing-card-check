@@ -61,6 +61,9 @@ export const createEmailForId = async (client, id, email) => {
 };
 
 export const markEmailAsSentForId = async (client, id) => {
-	const res = await client.query('UPDATE emails SET email_sent_at = NOW() WHERE id = $1', [id, ]);
-	return res.rows[0];
+	await client.query('UPDATE emails SET email_sent_at = NOW() WHERE id = $1', [id]);
+};
+
+export const setEmailStatus = async (client, email, status) => {
+	await client.query('UPDATE emails SET email_status = $2, status_updated_at = NOW() WHERE email = $1', [email, status]);
 };

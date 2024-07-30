@@ -1,11 +1,12 @@
 import { strict as assert } from 'assert';
+import { EventWebhook, EventWebhookHeader } from '@sendgrid/eventwebhook';
 
 const sendgridApi = 'https://api.sendgrid.com/v3/mail/send';
 const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || 'localhost';
 const templateId = 'd-085549f7a6ec4dc39a7d48878d405140';
 const from = process.env.FROM_EMAIL_ADDRESS || 'noreply@mmadraimov.eu';
 
-const sendEmail = async (toName, toEmail, emailSlug) => {
+export const sendEmail = async (toName, toEmail, emailSlug) => {
 	const apiKey = process.env.SENDGRID_API_KEY;
 
 	assert.notEqual(apiKey, undefined, 'missing sendgrid api key');
@@ -46,4 +47,18 @@ const sendEmail = async (toName, toEmail, emailSlug) => {
 	}
 };
 
-export { sendEmail };
+export const verifyEventWebhook = (headers, payload) => {
+	const verify = new EventWebhook();
+	const publicKey = process.env.SENDGRID_WEBHOOK_KEY;
+
+	const signature = headers[EventWebhookHeader.SIGNATURE().toLowerCase()];
+	const timestamp = headers[EventWebhookHeader.TIMESTAMP().toLowerCase()];
+
+	const ecdsaPublicKey = verify.convertPublicKeyToECDSA(publicKey);
+	return verify.verifySignature(
+		ecdsaPublicKey,
+		payload,
+		signature,
+		timestamp
+	);
+};
