@@ -9,4 +9,9 @@ const validateToken = (token) => {
 	assert.equal(token, process.env.WEBHOOK_TOKEN, 'Invalid token');
 };
 
-export { validateId, validateToken };
+const validateEmailSlug = (emailSlug) => {
+	assert.equal(typeof emailSlug, 'string', 'invalid email slug');
+	assert.equal(emailSlug.length, 36, 'invalid email slug');
+};
+
+export { validateId, validateToken, validateEmailSlug };

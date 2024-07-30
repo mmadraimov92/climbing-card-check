@@ -2,7 +2,7 @@ import { strict as assert } from 'assert';
 import { EventWebhook, EventWebhookHeader } from '@sendgrid/eventwebhook';
 
 const sendgridApi = 'https://api.sendgrid.com/v3/mail/send';
-const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || 'localhost';
+const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || 'localhost:3000';
 const templateId = 'd-085549f7a6ec4dc39a7d48878d405140';
 const from = process.env.FROM_EMAIL_ADDRESS || 'noreply@mmadraimov.eu';
 
