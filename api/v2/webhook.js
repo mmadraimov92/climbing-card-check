@@ -38,11 +38,11 @@ export default async function handler(request, response) {
 		let emailSlug = '';
 		const email = await db.fetchEmailById(dbClient, climber.id);
 		if (email === undefined) {
-			emailSlug = await db.createEmailForId(dbClient, climber.id, climber.email);
+			const result = await db.createEmailForId(dbClient, climber.id, climber.email);
+			emailSlug = result.emailSlug;
 		} else {
 			emailSlug = email.emailSlug;
 		}
-  
 		await sendgrid.sendEmail(climber.name, climber.email, emailSlug);
 		await db.markEmailAsSent(dbClient, climber.id);
 	} catch (error) {

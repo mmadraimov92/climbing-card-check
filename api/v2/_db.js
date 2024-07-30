@@ -70,7 +70,7 @@ export const fetchEmailByEmailSlug = async (client, emailSlug) => {
 };
 
 export const createEmailForId = async (client, id, email) => {
-	const res = await client.query('INSERT INTO emails (id, email) VALUES ($1, $2) RETURNING email_slug', [id, email]);
+	const res = await client.query('INSERT INTO emails (id, email) VALUES ($1, $2) RETURNING email_slug AS "emailSlug"', [id, email]);
 	return res.rows[0];
 };
 
