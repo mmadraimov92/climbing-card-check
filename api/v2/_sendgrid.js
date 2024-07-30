@@ -3,6 +3,7 @@ import { strict as assert } from 'assert';
 const sendgridApi = 'https://api.sendgrid.com/v3/mail/send';
 const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || 'localhost';
 const templateId = 'd-085549f7a6ec4dc39a7d48878d405140';
+const from = process.env.FROM_EMAIL_ADDRESS || 'noreply@mmadraimov.eu';
 
 const sendEmail = async (toName, toEmail, emailSlug) => {
 	const apiKey = process.env.SENDGRID_API_KEY;
@@ -14,7 +15,7 @@ const sendEmail = async (toName, toEmail, emailSlug) => {
 
 	const body = {
 		from:{
-			email:'mmadraimov@gmail.com'
+			email:from
 		},
 		personalizations:[
 			{
