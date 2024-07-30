@@ -1,11 +1,11 @@
 import pg from 'pg';
 const { Client } = pg;
 
-const connect = async () => {
+export const connect = async () => {
 	const config = {
 		user: process.env.PGUSER || 'postgres',
 		password: process.env.PGPASSWORD || 'postgres',
-		host: process.env.PGHOST || 'localhost',
+		host: process.env.PGHOST || '127.0.0.1',
 		port: process.env.PGPORT || 5432,
 		database: process.env.PGDATABASE || 'postgres',
 		query_timeout: 5000,
@@ -22,10 +22,8 @@ const connect = async () => {
 	return client;
 };
 
-export const fetchClimberById = async (id) => {
-	const client = await connect();
-	try {
-		const res = await client.query(`
+export const fetchClimberById = async (client, id) => {
+	const res = await client.query(`
       SELECT
         id,
         certificate,
@@ -37,19 +35,14 @@ export const fetchClimberById = async (id) => {
         consent_given AS "consentGiven"
       FROM climbers
       WHERE id = $1`, [id]);
-		if (!res.rowCount) {
-			throw new Error('not found');
-		}
-		return res.rows[0];
-	} finally {
-		await client.end();
+	if (!res.rowCount) {
+		throw new Error('not found');
 	}
+	return res.rows[0];
 };
 
-export const fetchEmailById = async (id) => {
-	const client = await connect();
-	try {
-		const res = await client.query(`
+export const fetchEmailById = async (client, id) => {
+	const res = await client.query(`
       SELECT
         id,
         email_slug AS "emailSlug",
@@ -58,28 +51,15 @@ export const fetchEmailById = async (id) => {
         email_status
       FROM emails
       WHERE id = $1`, [id]);
-		return res.rows[0];
-	} finally {
-		await client.end();
-	}
+	return res.rows[0];
 };
 
-export const createEmailForId = async (id) => {
-	const client = await connect();
-	try {
-		const res = await client.query('INSERT INTO emails (id) VALUES ($1) RETURNING email_slug', [id]);
-		return res.rows[0];
-	} finally {
-		await client.end();
-	}
+export const createEmailForId = async (client, id) => {
+	const res = await client.query('INSERT INTO emails (id) VALUES ($1) RETURNING email_slug', [id]);
+	return res.rows[0];
 };
 
-export const markEmailAsSentForId = async (id) => {
-	const client = await connect();
-	try {
-		const res = await client.query('UPDATE emails SET email_sent_at = NOW() WHERE id = $1', [id, ]);
-		return res.rows[0];
-	} finally {
-		await client.end();
-	}
+export const markEmailAsSentForId = async (client, id) => {
+	const res = await client.query('UPDATE emails SET email_sent_at = NOW() WHERE id = $1', [id, ]);
+	return res.rows[0];
 };

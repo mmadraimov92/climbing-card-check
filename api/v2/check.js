@@ -17,12 +17,20 @@ export default async function handler(request, response) {
 	}
 
 	try {
-		const result = await db.fetchClimberById(id); 
+		var dbClient = await db.connect();
+	} catch (error) {
+		console.log(error);
+		return response.status(500).json(error.message);
+	}
+  
+	try {
+		const result = await db.fetchClimberById(dbClient, id); 
 		return response.status(200).json({success:true, ...result});
 	} catch (error) {
 		console.log(error);
 		return response.status(200).json({success:false, id, message: error.message });
 	} finally {
 		console.log({ ts: new Date(), responseTime: Date.now() - start, id});
+		dbClient.end();
 	}
 }

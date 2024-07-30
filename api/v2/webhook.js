@@ -25,26 +25,34 @@ export default async function handler(request, response) {
 	}
 
 	try {
-		const climber = await db.fetchClimberById(id); 
+		var dbClient = await db.connect();
+	} catch (error) {
+		console.log(error);
+		return response.status(500).json(error.message);
+	}
+
+	try {
+		const climber = await db.fetchClimberById(dbClient, id); 
 		if (climber.consentGiven) {
 			return response.status(200).json({ success:true, id, message: 'consent already given' });
 		}
 
 		let emailSlug = '';
-		const email = await db.fetchEmailById(climber.id);
+		const email = await db.fetchEmailById(dbClient, climber.id);
 		if (email === undefined) {
-			emailSlug = await db.createEmailForId(id);
+			emailSlug = await db.createEmailForId(dbClient, id);
 		} else {
 			emailSlug = email.emailSlug;
 		}
   
 		await sendgrid.sendEmail(climber.name, climber.email, emailSlug);
-		await db.markEmailAsSentForId(climber.id);
+		await db.markEmailAsSentForId(dbClient, climber.id);
 	} catch (error) {
 		console.log(error);
 		return response.status(200).json({ success:false, id, message: error.message });
 	} finally {
 		console.log({ ts: new Date(), responseTime: Date.now() - start, id});
+		dbClient.end();
 	}
 
 	return response.status(200).json({ success:true, id, message: 'processed' });
