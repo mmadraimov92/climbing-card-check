@@ -12,6 +12,7 @@ CREATE TABLE climbers (
 
 CREATE TABLE emails (
   id NUMERIC(11) PRIMARY KEY,
+  email VARCHAR (255) UNIQUE NOT NULL,
   email_slug UUID NOT NULL DEFAULT gen_random_uuid(),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   email_sent_at TIMESTAMP,

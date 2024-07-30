@@ -45,6 +45,7 @@ export const fetchEmailById = async (client, id) => {
 	const res = await client.query(`
       SELECT
         id,
+				email,
         email_slug AS "emailSlug",
         created_at,
         email_sent_at,
@@ -54,8 +55,8 @@ export const fetchEmailById = async (client, id) => {
 	return res.rows[0];
 };
 
-export const createEmailForId = async (client, id) => {
-	const res = await client.query('INSERT INTO emails (id) VALUES ($1) RETURNING email_slug', [id]);
+export const createEmailForId = async (client, id, email) => {
+	const res = await client.query('INSERT INTO emails (id, email) VALUES ($1, $2) RETURNING email_slug', [id, email]);
 	return res.rows[0];
 };
 
