@@ -41,7 +41,7 @@ export const fetchClimberById = async (client, id) => {
 	return res.rows[0];
 };
 
-export const fetchEmailById = async (client, id) => {
+export const fetchEmailSlugByEmail = async (client, email) => {
 	const res = await client.query(`
       SELECT
         id,
@@ -51,11 +51,11 @@ export const fetchEmailById = async (client, id) => {
         email_sent_at,
         email_status
       FROM emails
-      WHERE id = $1`, [id]);
+      WHERE email = $1`, [email]);
 	return res.rows[0];
 };
 
-export const fetchEmailByEmailSlug = async (client, emailSlug) => {
+export const fetchEmailSlug = async (client, emailSlug) => {
 	const res = await client.query(`
       SELECT
         id,
@@ -69,7 +69,7 @@ export const fetchEmailByEmailSlug = async (client, emailSlug) => {
 	return res.rows[0];
 };
 
-export const createEmailForId = async (client, id, email) => {
+export const createEmailSlugForId = async (client, id, email) => {
 	const res = await client.query('INSERT INTO emails (id, email) VALUES ($1, $2) RETURNING email_slug AS "emailSlug"', [id, email]);
 	return res.rows[0];
 };

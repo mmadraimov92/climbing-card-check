@@ -36,9 +36,9 @@ export default async function handler(request, response) {
 		}
 
 		let emailSlug = '';
-		const email = await db.fetchEmailById(dbClient, climber.id);
+		const email = await db.fetchEmailSlugByEmail(dbClient, climber.email);
 		if (email === undefined) {
-			const result = await db.createEmailForId(dbClient, climber.id, climber.email);
+			const result = await db.createEmailSlugForId(dbClient, climber.id, climber.email);
 			emailSlug = result.emailSlug;
 		} else {
 			emailSlug = email.emailSlug;

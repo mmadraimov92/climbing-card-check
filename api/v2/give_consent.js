@@ -20,9 +20,9 @@ export default async function handler(request, response) {
 		console.log(error);
 		return respondFail(response, error.message);
 	}
-  
+
 	try {
-		const email = await db.fetchEmailByEmailSlug(dbClient, emailSlug);
+		const email = await db.fetchEmailSlug(dbClient, emailSlug);
 		if (email === undefined) {
 			return respondFail(response, 'email not found');
 		}
