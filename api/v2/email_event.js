@@ -1,5 +1,6 @@
 import * as db from './_db.js';
 import * as sendgrid from './_sendgrid.js';
+import { respondSuccess, respondFail } from './_response.js';
 
 export default async function handler(request, response) {
 	if (request.method !== 'POST') {
@@ -18,7 +19,7 @@ export default async function handler(request, response) {
 
 		try {
 			if (!sendgrid.verifyEventWebhook(request.headers, payload)) {
-				response.status(401).send();
+				respondFail(response, 'unauthorized');
 			}
 
 			var dbClient = await db.connect();
@@ -31,11 +32,10 @@ export default async function handler(request, response) {
 			}
 		} catch (error) {
 			console.log(error.message);
-			response.status(500).json(error.message);
+			respondFail(response, error.message);
 		} finally {
-			console.log('closing db connection');
 			dbClient.end();
 		}
-		response.status(200).send();
+		respondSuccess(response, 'sendgrid webhook event processed');
 	});
 }

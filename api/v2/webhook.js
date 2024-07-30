@@ -1,6 +1,6 @@
 import * as db from './_db.js';
 import * as sendgrid from './_sendgrid.js';
-
+import { respondSuccess, respondFail } from './_response.js';
 import { validateToken, validateId } from './_validation.js';
 
 export default async function handler(request, response) {
@@ -8,33 +8,31 @@ export default async function handler(request, response) {
 		return response.status(405).send();
 	}
 
-	const start = Date.now();
-
 	const token = request.headers['x-webhook-token'] || '';
 	try {
 		validateToken(token);
-	} catch {
-		return response.status(401).send();
+	} catch (error) {
+		return respondFail(response, error.message);
 	}
 
 	const { id } = request.body;
 	try {
 		validateId(id);
 	} catch (error) {
-		return response.status(400).json(error.message);
+		return respondFail(response, error.message);
 	}
 
 	try {
 		var dbClient = await db.connect();
 	} catch (error) {
 		console.log(error);
-		return response.status(500).json(error.message);
+		return respondFail(response, error.message);
 	}
 
 	try {
-		const climber = await db.fetchClimberById(dbClient, id); 
+		const climber = await db.fetchClimberById(dbClient, id);
 		if (climber.consentGiven) {
-			return response.status(200).json({ success:true, id, message: 'consent already given' });
+			return respondSuccess(response, 'consent already given');
 		}
 
 		let emailSlug = '';
@@ -46,14 +44,13 @@ export default async function handler(request, response) {
 		}
   
 		await sendgrid.sendEmail(climber.name, climber.email, emailSlug);
-		await db.markEmailAsSentForId(dbClient, climber.id);
+		await db.markEmailAsSent(dbClient, climber.id);
 	} catch (error) {
 		console.log(error);
-		return response.status(200).json({ success:false, id, message: error.message });
+		return respondFail(response, error.message);
 	} finally {
-		console.log({ ts: new Date(), responseTime: Date.now() - start, id});
 		dbClient.end();
 	}
 
-	return response.status(200).json({ success:true, id, message: 'processed' });
+	return respondSuccess(response, 'processed');
 }
