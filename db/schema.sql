@@ -6,5 +6,14 @@ CREATE TABLE climbers (
   exam_date TIMESTAMP,
   expiry_date TIMESTAMP,
   examiner VARCHAR(64),
+  consent_given BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE emails (
+  id NUMERIC(11) PRIMARY KEY,
+  email_slug UUID NOT NULL DEFAULT gen_random_uuid(),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  email_sent_at TIMESTAMP,
+  email_status VARCHAR(64)
 );

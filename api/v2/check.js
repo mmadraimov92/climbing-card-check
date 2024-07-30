@@ -12,12 +12,12 @@ export default async function handler(request, response) {
 	const { id } = request.query;
 	try {
 		validateId(id);
-	} catch (err) {
-		return response.status(400).json(err.message);
+	} catch (error) {
+		return response.status(400).json(error.message);
 	}
 
 	try {
-		const result = await db.fetchById(id); 
+		const result = await db.fetchClimberById(id); 
 		return response.status(200).json({success:true, ...result});
 	} catch (error) {
 		console.log(error);

@@ -5,4 +5,8 @@ const validateId = (id) => {
 	assert.match(id, /[0-9]{11}/, 'Expected ID to consist of 11 digits');
 };
 
-export { validateId };
+const validateToken = (token) => {
+	assert.equal(token, process.env.WEBHOOK_TOKEN, 'Invalid token');
+};
+
+export { validateId, validateToken };

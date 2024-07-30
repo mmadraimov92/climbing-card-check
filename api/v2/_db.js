@@ -22,7 +22,7 @@ const connect = async () => {
 	return client;
 };
 
-const fetchById = async (id) => {
+export const fetchClimberById = async (id) => {
 	const client = await connect();
 	try {
 		const res = await client.query(`
@@ -30,9 +30,11 @@ const fetchById = async (id) => {
         id,
         certificate,
         name,
+        email,
         examiner,
         exam_date AS "examTime",
-        expiry_date AS "expiryTime"
+        expiry_date AS "expiryTime",
+        consent_given AS "consentGiven"
       FROM climbers
       WHERE id = $1`, [id]);
 		if (!res.rowCount) {
@@ -44,4 +46,40 @@ const fetchById = async (id) => {
 	}
 };
 
-export { fetchById };
+export const fetchEmailById = async (id) => {
+	const client = await connect();
+	try {
+		const res = await client.query(`
+      SELECT
+        id,
+        email_slug AS "emailSlug",
+        created_at,
+        email_sent_at,
+        email_status
+      FROM emails
+      WHERE id = $1`, [id]);
+		return res.rows[0];
+	} finally {
+		await client.end();
+	}
+};
+
+export const createEmailForId = async (id) => {
+	const client = await connect();
+	try {
+		const res = await client.query('INSERT INTO emails (id) VALUES ($1) RETURNING email_slug', [id]);
+		return res.rows[0];
+	} finally {
+		await client.end();
+	}
+};
+
+export const markEmailAsSentForId = async (id) => {
+	const client = await connect();
+	try {
+		const res = await client.query('UPDATE emails SET email_sent_at = NOW() WHERE id = $1', [id, ]);
+		return res.rows[0];
+	} finally {
+		await client.end();
+	}
+};
