@@ -20,14 +20,19 @@ export default async function handler(request, response) {
 		console.log(error);
 		return respondFail(response, error.message);
 	}
-  
+
+	await handle(request, response, dbClient);
+	dbClient.end();
+}
+
+export const handle = async (request, response, dbClient) => {
+	const { id } = request.query;
+
 	try {
 		const result = await db.fetchClimberById(dbClient, id);
 		return respondSuccess(response, 'success', result);
 	} catch (error) {
 		console.log(error);
 		return respondFail(response, error.message);
-	} finally {
-		dbClient.end();
 	}
-}
+};
