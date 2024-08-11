@@ -1,14 +1,16 @@
 import { suite, before, after, test } from 'node:test';
-import assert from 'node:assert/strict';
-import fs from 'fs';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
+import { requestMock, responseMock } from './_utils.js';
+import assert from 'node:assert/strict';
+import { handle } from '../../api/v2/check.js';
+import fs from 'fs';
 import pg from 'pg';
-const { Client } = pg;
 
+const { Client } = pg;
 const schema = fs.readFileSync('db/schema.sql').toString();
 const fixture = fs.readFileSync('test/v2/fixture.sql').toString();
 
-suite('Check climbers certificate endpoint', () => {
+suite('Climbers certificate check endpoint', () => {
 	let container;
 	let dbClient;
 
@@ -24,9 +26,25 @@ suite('Check climbers certificate endpoint', () => {
 		await dbClient.end();
 		await container.stop();
 	});
-	
-	test('climbers count', async () => {
-		const res = await dbClient.query('SELECT count(*) FROM climbers;');
-		assert.equal(res.rows[0].count, '1');
+
+	test('climber not found', async () => {
+		const request = requestMock('GET', {id:'12345678901'});
+		const response = responseMock();
+		await handle(request, response, dbClient);
+
+		assert.equal(response.statusCode, 200);
+		assert.equal(response.body.success, false);
+		assert.equal(response.body.message, 'not found');
+	});
+
+	test('climber with green certificate', async () => {
+		const request = requestMock('GET', {id:'10000000000'});
+		const response = responseMock();
+		await handle(request, response, dbClient);
+
+		assert.equal(response.statusCode, 200);
+		assert.equal(response.body.success, true);
+		assert.equal(response.body.message, 'success');
+		assert.equal(response.body.certificate, 'green');
 	});
 });
