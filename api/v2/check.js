@@ -1,6 +1,6 @@
-import * as db from './_db.js';
-import { respondSuccess, respondFail } from './_response.js';
-import { validateId } from './_validation.js';
+import * as db from './utils/_db.js';
+import { respondSuccess, respondFail } from './utils/_response.js';
+import { validateId } from './utils/_validation.js';
 
 export default async function handler(request, response) {
 	if (request.method !== 'GET') {
