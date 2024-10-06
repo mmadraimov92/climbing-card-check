@@ -46,19 +46,3 @@ export const sendEmail = async (toName, toEmail, emailSlug) => {
 		throw new Error('email send failed');
 	}
 };
-
-export const verifyEventWebhook = (headers, payload) => {
-	const verify = new EventWebhook();
-	const publicKey = process.env.SENDGRID_WEBHOOK_KEY;
-
-	const signature = headers[EventWebhookHeader.SIGNATURE().toLowerCase()];
-	const timestamp = headers[EventWebhookHeader.TIMESTAMP().toLowerCase()];
-
-	const ecdsaPublicKey = verify.convertPublicKeyToECDSA(publicKey);
-	return verify.verifySignature(
-		ecdsaPublicKey,
-		payload,
-		signature,
-		timestamp
-	);
-};

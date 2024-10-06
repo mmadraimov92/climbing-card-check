@@ -15,7 +15,6 @@
     "node": "20.x"
   },
   "dependencies": {
-    "@sendgrid/eventwebhook": "^8.0.0",
     "pg": "^8.12.0"
   },
   "devDependencies": {
