@@ -6,7 +6,6 @@ export default async function handler(request, response) {
 		return response.status(405).send();
 	}
 
-	
 	const orderToken = request.query['order-token'];
 	try {
 		montonio.decodeToken(orderToken);
@@ -14,5 +13,5 @@ export default async function handler(request, response) {
 		return respondFail(response, 'invalid token');
 	}
 
-	return respondSuccess(response, 'payment success');
+	return respondSuccess(response, 'payment processed successfully');
 }
