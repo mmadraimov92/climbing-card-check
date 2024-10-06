@@ -32,7 +32,7 @@ export const fetchClimberById = async (client, id) => {
         examiner,
         exam_date AS "examTime",
         expiry_date AS "expiryTime",
-        consent_given AS "consentGiven"
+        payment_received AS "paymentReceived"
       FROM climbers
       WHERE id = $1`, [id]);
 	if (!res.rowCount) {
@@ -41,47 +41,37 @@ export const fetchClimberById = async (client, id) => {
 	return res.rows[0];
 };
 
-export const fetchEmailSlugByEmail = async (client, email) => {
+export const fetchPaymentOrderByClimberId = async (client, id) => {
 	const res = await client.query(`
       SELECT
-        id,
-        email,
-        email_slug AS "emailSlug",
-        created_at,
-        email_sent_at,
-        email_status
-      FROM emails
-      WHERE email = $1`, [email]);
+        order_id AS "orderId",
+        status,
+        payment_url AS "paymentUrl",
+        expires_at < CURRENT_TIMESTAMP AS "isExpired"
+      FROM payment_orders
+      WHERE climber_id = $1
+      ORDER BY created_at DESC
+      LIMIT 1`, [id]);
 	return res.rows[0];
 };
 
-export const fetchEmailSlug = async (client, emailSlug) => {
-	const res = await client.query(`
-      SELECT
-        id,
-        email,
-        email_slug AS "emailSlug",
-        created_at,
-        email_sent_at,
-        email_status
-      FROM emails
-      WHERE email_slug = $1`, [emailSlug]);
-	return res.rows[0];
+export const createPaymentOrder = async (client, climber, order) => {
+	await client.query(
+		`INSERT INTO payment_orders (order_id, climber_id, status, amount, payment_url, expires_at)
+		VALUES ($1, $2, $3, $4, $5, $6)`,
+		[order.uuid, climber.id, order.paymentStatus, order.grandTotal, order.paymentUrl, order.expiresAt],
+	);
 };
 
-export const createEmailSlugForId = async (client, id, email) => {
-	const res = await client.query('INSERT INTO emails (id, email) VALUES ($1, $2) RETURNING email_slug AS "emailSlug"', [id, email]);
-	return res.rows[0];
+export const markEmailAsSent = async (client, order_id) => {
+	await client.query('UPDATE payment_orders SET email_sent_at = NOW() WHERE order_id = $1', [order_id]);
 };
 
-export const markEmailAsSent = async (client, id) => {
-	await client.query('UPDATE emails SET email_sent_at = NOW() WHERE id = $1', [id]);
+export const markClimberAsPaymentReceived = async (client, id) => {
+	await client.query('UPDATE climbers SET payment_received = TRUE WHERE id = $1', [id]);
 };
 
-export const setEmailStatus = async (client, email, status) => {
-	await client.query('UPDATE emails SET email_status = $2, status_updated_at = NOW() WHERE email = $1', [email, status]);
-};
-
-export const markClimberAsConsentGiven = async (client, id) => {
-	await client.query('UPDATE climbers SET consent_given = TRUE WHERE id = $1', [id]);
+export const updatePaymentOrderStatus = async (client, order) => {
+	const res = await client.query('UPDATE payment_orders SET status = $2 WHERE order_id = $1 RETURNING climber_id AS "climberId"', [order.uuid, order.paymentStatus]);
+	return res.rows[0].climberId;
 };

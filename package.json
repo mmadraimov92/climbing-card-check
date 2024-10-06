@@ -15,6 +15,7 @@
     "node": "20.x"
   },
   "dependencies": {
+    "jsonwebtoken": "^9.0.2",
     "pg": "^8.12.0"
   },
   "devDependencies": {

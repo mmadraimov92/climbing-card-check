@@ -6,16 +6,18 @@ CREATE TABLE climbers (
   exam_date TIMESTAMP,
   expiry_date TIMESTAMP,
   examiner VARCHAR(64),
-  consent_given BOOLEAN NOT NULL DEFAULT FALSE,
+  payment_received BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE emails (
-  id NUMERIC(11) PRIMARY KEY,
-  email VARCHAR (255) UNIQUE NOT NULL,
-  email_slug UUID NOT NULL DEFAULT gen_random_uuid(),
+CREATE TABLE payment_orders (
+  order_id UUID PRIMARY KEY,
+  climber_id NUMERIC(11) NOT NULL,
+  status VARCHAR(64) NOT NULL,
+  amount numeric CHECK (amount > 0),
+  payment_url VARCHAR (255) UNIQUE NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  email_sent_at TIMESTAMP,
-  email_status VARCHAR(64),
-  status_updated_at TIMESTAMP
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  email_sent_at TIMESTAMP
 );

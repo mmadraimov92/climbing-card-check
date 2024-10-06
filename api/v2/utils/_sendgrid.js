@@ -1,18 +1,16 @@
 import { strict as assert } from 'assert';
-import { EventWebhook, EventWebhookHeader } from '@sendgrid/eventwebhook';
 
 const sendgridApi = 'https://api.sendgrid.com/v3/mail/send';
-const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || 'localhost:3000';
-const templateId = 'd-085549f7a6ec4dc39a7d48878d405140';
+const templateId = 'd-e65f3cf4f3b94e66b515feaa45542a21';
 const from = process.env.FROM_EMAIL_ADDRESS || 'noreply@mmadraimov.eu';
 
-export const sendEmail = async (toName, toEmail, emailSlug) => {
+export const sendEmail = async (toName, toEmail, paymentUrl) => {
 	const apiKey = process.env.SENDGRID_API_KEY;
 
 	assert.notEqual(apiKey, undefined, 'missing sendgrid api key');
 	assert.notEqual(toName, undefined, 'empty toName when sending email');
 	assert.notEqual(toEmail, undefined, 'empty toEmail when sending email');
-	assert.notEqual(emailSlug, undefined, 'empty emailSlug when sending email');
+	assert.notEqual(paymentUrl, undefined, 'empty paymentUrl when sending email');
 
 	const body = {
 		from:{
@@ -23,14 +21,14 @@ export const sendEmail = async (toName, toEmail, emailSlug) => {
 				to:[{email:toEmail}],
 				dynamic_template_data:{
 					'name':toName,
-					'give_consent_url':'https://'+host+'/api/v2/give_consent?emailSlug='+emailSlug,
+					'payment_url':paymentUrl,
 				}
 			}
 		],
 		template_id:templateId
 	};
 
-	const response = await fetch(sendgridApi, 
+	const response = await fetch(sendgridApi,
 		{
 			method: 'POST',
 			headers:{
